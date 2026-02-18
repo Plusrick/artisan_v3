@@ -13,7 +13,7 @@
 # the GNU General Public License for more details.
 #
 # AUTHOR
-# Dave Baxter, Marko Luther 2025
+# Dave Baxter, Marko Luther 2026
 """
 
 Usage:
@@ -129,7 +129,7 @@ a = Analysis(['artisan.py'],
              hiddenimports=['babel.numbers'], # should not be needed as it got fixed in pyinstaller 6.11
              hooksconfig={
                 'matplotlib': {
-                'backends': ['QtAgg', 'svg'] # 'auto',  # auto-detect; the default behavior (QtAgg
+                'backends': ['QtAgg', 'svg', 'pdf'] # 'auto',  # auto-detect; the default behavior (QtAgg
                 },
              },
              hookspath=[],
@@ -287,7 +287,7 @@ qt_plugin_files = [
     'libqjpeg.dylib',
 #    'libqmacjp2.dylib',
 #    'libqpdf.dylib',
-	'libqsvg.dylib',
+    'libqsvg.dylib',
 #    'libqtga.dylib',
 #   'libqtiff.dylib',
 #    'libqwbmp.dylib',
@@ -296,7 +296,6 @@ qt_plugin_files = [
     'libcocoaprintersupport.dylib',
     'libqmacstyle.dylib'
 ]
-
 
 ## remove unused Qt frameworks libs (not in Qt_modules_frameworks)
 for subdir, dirs, _files in os.walk('./Artisan.app/Contents/Frameworks/PyQt6/Qt6/lib'):

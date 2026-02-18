@@ -736,7 +736,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
     def __init__(self, plotCanvas:tgraphcanvas, parent:QWidget, white_icons:bool = False) -> None:
 
         # toolitem entries of the form (text, tooltip_text, image_file, callback)
-        self.toolitems: list[tuple[str, ...] | tuple[None, ...]] = [ # pyrefly:ignore[bad-override]
+        self.toolitems: list[tuple[str, ...] | tuple[None, ...]] = [ # zuban:ignore[assignment] # pyrefly:ignore[bad-override]
                 ('Plus', QApplication.translate('Tooltip', 'Connect to plus service'), 'plus', 'plus'),
                 ('', QApplication.translate('Tooltip', 'Subscription'), 'plus-pro', 'subscription'),
                 (QApplication.translate('Toolbar', 'Home'), QApplication.translate('Tooltip', 'Reset original view'), 'home', 'home'),
@@ -806,9 +806,9 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         self._update_view = self.update_view_new # pyright: ignore # Cannot assign to a method  [method-assign]
 
         self.release_pan_org = self.release_pan
-        self.release_pan = self.release_pan_new # type: ignore[method-assign] # ty:ignore[ignore] # Cannot assign to a method  [method-assign]
+        self.release_pan = self.release_pan_new # type:ignore[method-assign,misc,unused-ignore] # ty:ignore[unused-ignore]  # Cannot assign to a method  [method-assign]
         self.release_zoom_org = self.release_zoom
-        self.release_zoom = self.release_zoom_new # type: ignore[method-assign] # ty:ignore[ignore] # Cannot assign to a method  [method-assign]
+        self.release_zoom = self.release_zoom_new # type:ignore[method-assign,misc,unused-ignore] # ty:ignore[unused-ignore] # Cannot assign to a method  [method-assign]
 
 #        # monkey patch matplotlib figureoptions that links to svg icon by default (crashes Windows Qt4 builds!)
 #        if not svgsupport:
@@ -1273,7 +1273,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 elif self.aw.plus_subscription == 'HOME':
                     plus_link += '/home-roasters'
                 if res == QMessageBox.StandardButton.Yes:
-                    QDesktopServices.openUrl(QUrl(plus_link, QUrl.ParsingMode.TolerantMode))
+                    QDesktopServices.openUrl(QUrl(plus_link, QUrl.ParsingMode.TolerantMode)) # zuban:ignore[unreachable]
 #                box = QMessageBox(self)
 #                box.about(self.aw, QApplication.translate('Message', 'Subscription'),message)
             except Exception as e: # pylint: disable=broad-except
@@ -1493,6 +1493,7 @@ class ApplicationWindow(QMainWindow):
         'lcd6', 'lcd7', 'label2', 'label3', 'label4', 'label5', 'label6', 'label7', 'extraLCD1', 'extraLCD2', 'extraLCDlabel1', 'extraLCDlabel2',
         'extraLCDframe1', 'extraLCDframe2', 'extraLCDvisibility1', 'extraLCDvisibility2', 'extraCurveVisibility1', 'extraCurveVisibility2',
         'extraDelta1', 'extraDelta2', 'extraFill1', 'extraFill2', 'channel_tare_values', 'messagehist', 'eventlabel', 'eNumberSpinBox',
+        'extraDelta1b', 'extraDelta2b',
         'lineEvent', 'etypeComboBox', 'valueEdit', 'etimeline', 'buttonminiEvent', 'buttonlist', 'buttonStates', 'lastbuttonpressed', 'buttonlistmaxlen',
         'buttonpalette_default_label', 'buttonpalette_label', 'buttonpalettemaxlen_min', 'buttonpalettemaxlen_max',
         'buttonpalettemaxlen_default', 'buttonpalettemaxlen', 'buttonpalette_shortcuts', 'buttonsize_default', 'buttonsize',
@@ -2034,13 +2035,19 @@ class ApplicationWindow(QMainWindow):
 
         #FILE menu
         self.newRoastMenu:QMenu = QMenu(QApplication.translate('Menu', 'New'))
+        if QIcon.hasThemeIcon('document-new'):
+            self.newRoastMenu.setIcon(QIcon.fromTheme('document-new'))
 
         self.fileLoadAction = QAction(QApplication.translate('Menu', 'Open...'),self)
         self.fileLoadAction.setMenuRole(QAction.MenuRole.NoRole)
         self.fileLoadAction.setShortcut(QKeySequence.StandardKey.Open)
+        if QIcon.hasThemeIcon('document-open'):
+            self.fileLoadAction.setIcon(QIcon.fromTheme('document-open'))
         self.fileLoadAction.triggered.connect(self.fileLoad)
 
         self.openRecentMenu = QMenu(QApplication.translate('Menu', 'Open Recent'))
+        if QIcon.hasThemeIcon('document-open-recent'):
+            self.openRecentMenu.setIcon(QIcon.fromTheme('document-open-recent'))
         orm_action = self.openRecentMenu.menuAction()
         if orm_action is not None:
             orm_action.setMenuRole(QAction.MenuRole.NoRole)
@@ -2189,9 +2196,13 @@ class ApplicationWindow(QMainWindow):
 
         self.fileSaveAction = QAction(QApplication.translate('Menu', 'Save'), self)
         self.fileSaveAction.setShortcut(QKeySequence.StandardKey.Save)
+        if QIcon.hasThemeIcon('document-save'):
+            self.fileSaveAction.setIcon(QIcon.fromTheme('document-save'))
         self.fileSaveAction.triggered.connect(self.fileSave_current_action)
 
         self.fileSaveAsAction = QAction(QApplication.translate('Menu', 'Save As...'), self)
+        if QIcon.hasThemeIcon('document-save-as'):
+            self.fileSaveAsAction.setIcon(QIcon.fromTheme('document-save-as'))
         self.fileSaveAsAction.setShortcut(QKeySequence.StandardKey.SaveAs)
         self.fileSaveAsAction.triggered.connect(self.fileSave_new_action)
 
@@ -2200,6 +2211,8 @@ class ApplicationWindow(QMainWindow):
         self.fileSaveCopyAsAction.triggered.connect(self.fileSave_copy_action)
 
         self.exportMenu:QMenu = QMenu(QApplication.translate('Menu', 'Export'))
+        if QIcon.hasThemeIcon('document-export'):
+            self.exportMenu.setIcon(QIcon.fromTheme('document-export'))
         fileExportCSVAction = QAction(QApplication.translate('Menu', 'Artisan CSV...'), self)
         fileExportCSVAction.triggered.connect(self.fileExportCSV)
         self.exportMenu.addAction(fileExportCSVAction)
@@ -2389,6 +2402,8 @@ class ApplicationWindow(QMainWindow):
         self.saveStatisticsMenu.addAction(savestatisticsTXTAction)
 
         self.printAction:QAction = QAction(QApplication.translate('Menu', 'Print...'), self)
+        if QIcon.hasThemeIcon('document-print'):
+            self.printAction.setIcon(QIcon.fromTheme('document-print'))
         self.printAction.setShortcut(QKeySequence.StandardKey.Print)
         self.printAction.triggered.connect(self.filePrint)
 
@@ -2718,6 +2733,8 @@ class ApplicationWindow(QMainWindow):
             self.helpAboutAction = QAction(QApplication.translate('MAC_APPLICATION_MENU', 'About {0}').format(application_name), self)
         self.helpAboutAction.setMenuRole(QAction.MenuRole.AboutRole)
         self.helpAboutAction.triggered.connect(self.helpAbout)
+        if QIcon.hasThemeIcon('help-about'):
+            self.helpAboutAction.setIcon(QIcon.fromTheme('help-about'))
 
         self.aboutQtAction = QAction(QApplication.translate('Menu', 'About Qt'), self)
         self.aboutQtAction.setMenuRole(QAction.MenuRole.AboutQtRole)
@@ -2725,6 +2742,8 @@ class ApplicationWindow(QMainWindow):
 
         self.helpDocumentationAction = QAction(QApplication.translate('Menu', 'Documentation'), self)
         self.helpDocumentationAction.triggered.connect(self.helpHelp)
+        if QIcon.hasThemeIcon('help-faq'):
+            self.helpDocumentationAction.setIcon(QIcon.fromTheme('help-faq'))
         self.helpDocumentationAction.setShortcut(QKeySequence.StandardKey.HelpContents)
 
         self.KshortCAction = QAction(QApplication.translate('Menu', 'Keyboard Shortcuts'), self)
@@ -2767,6 +2786,7 @@ class ApplicationWindow(QMainWindow):
         self.resetAction.setMenuRole(QAction.MenuRole.NoRole)
         self.resetAction.triggered.connect(self.resetApplication)
 
+        # this one does not include the edit menu cut/copy/paste shortcuts which should never be disabled
         self.main_menu_actions_with_shortcuts:list[QAction|None] = [
             # file menu
             self.newRoastAction,
@@ -2776,10 +2796,10 @@ class ApplicationWindow(QMainWindow):
             self.htmlAction,
             self.printAction,
             self.quitAction,
-            # edit menu
-            self.cutAction,
-            self.copyAction,
-            self.pasteAction,
+#            # edit menu (not disabled to have same working in file dialogs)
+#            self.cutAction,
+#            self.copyAction,
+#            self.pasteAction,
             # roast menu
             self.editGraphAction,
             self.backgroundAction,
@@ -3413,6 +3433,8 @@ class ApplicationWindow(QMainWindow):
         self.extraCurveVisibility2: list[bool] = [True]*self.nLCDS
         self.extraDelta1: list[bool] = [False]*self.nLCDS
         self.extraDelta2: list[bool] = [False]*self.nLCDS
+        self.extraDelta1b: list[bool] = [False]*self.nLCDS # background curves
+        self.extraDelta2b: list[bool] = [False]*self.nLCDS # background curves
         self.extraFill1: list[int] = [0]*self.nLCDS # alpha values 0-100 in % of fill between extra curve and x-axis
         self.extraFill2: list[int] = [0]*self.nLCDS # alpha values 0-100 in % of fill between extra curve and x-axis
         for i in range(self.nLCDS):
@@ -3973,7 +3995,7 @@ class ApplicationWindow(QMainWindow):
 
         midleftlayout.addWidget(self.EventsGroupLayout)
 
-        self.slider1:QSlider = self.slider()
+        self.slider1:SliderUnclickable = self.slider()
         self.sliderLCD1:MyQLCDNumber = self.sliderLCD()
         self.sliderLCD1.setStyleSheet(self.sliderLCDstyle(0))
         self.sliderLCD1.display(self.slider1.value())
@@ -4003,7 +4025,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderLCD1.clicked.connect(self.slider1lcdClicked)
         self.sliderLCD1.double_clicked.connect(self.slider1lcdDoubleClicked)
 
-        self.slider2:QSlider = self.slider()
+        self.slider2:SliderUnclickable = self.slider()
         self.sliderLCD2:MyQLCDNumber = self.sliderLCD()
         self.sliderLCD2.setStyleSheet(self.sliderLCDstyle(1))
         self.sliderLCD2.display(self.slider2.value())
@@ -4033,7 +4055,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderLCD2.clicked.connect(self.slider2lcdClicked)
         self.sliderLCD2.double_clicked.connect(self.slider2lcdDoubleClicked)
 
-        self.slider3:QSlider = self.slider()
+        self.slider3:SliderUnclickable = self.slider()
         self.sliderLCD3:MyQLCDNumber = self.sliderLCD()
         self.sliderLCD3.setStyleSheet(self.sliderLCDstyle(2))
         self.sliderLCD3.display(self.slider3.value())
@@ -4063,7 +4085,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderLCD3.clicked.connect(self.slider3lcdClicked)
         self.sliderLCD3.double_clicked.connect(self.slider3lcdDoubleClicked)
 
-        self.slider4:QSlider = self.slider()
+        self.slider4:SliderUnclickable = self.slider()
         self.sliderLCD4:MyQLCDNumber = self.sliderLCD()
         self.sliderLCD4.setStyleSheet(self.sliderLCDstyle(3))
         self.sliderLCD4.display(self.slider4.value())
@@ -4093,7 +4115,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderLCD4.clicked.connect(self.slider4lcdClicked)
         self.sliderLCD4.double_clicked.connect(self.slider4lcdDoubleClicked)
 
-        self.sliderSV:QSlider = self.slider()
+        self.sliderSV:SliderUnclickable = self.slider()
         self.sliderLCDSV:MyQLCDNumber = self.sliderLCD()
         self.sliderLCDSV.setStyleSheet(self.sliderLCDstyle(4))
         self.sliderLCDSV.setNumDigits(3)
@@ -4278,9 +4300,9 @@ class ApplicationWindow(QMainWindow):
         if not self.app.artisanviewerMode:
             self.notificationManager = NotificationManager()
 
-        if sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
-            # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
-            self.installEventFilter(self)
+#        if sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
+#            # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
+#            self.installEventFilter(self)
 
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatusSlot)
@@ -5057,7 +5079,7 @@ class ApplicationWindow(QMainWindow):
                 donate_message_box.setDefaultButton(QMessageBox.StandardButton.Ok)
                 res = donate_message_box.exec()
                 if res == QMessageBox.StandardButton.Ok:
-                    QDesktopServices.openUrl(QUrl('https://artisan-scope.org/donate/', QUrl.ParsingMode.TolerantMode))
+                    QDesktopServices.openUrl(QUrl('https://artisan-scope.org/donate/', QUrl.ParsingMode.TolerantMode)) # zuban:ignore[unreachable]
                 self.resetDonateCounter()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -6445,9 +6467,8 @@ class ApplicationWindow(QMainWindow):
             whitep = self.colorDifference('#ffffff',canvas_color) > self.colorDifference('#000000',canvas_color)
 
         self.qmc.fig.patch.set_facecolor(str(canvas_color))
-        self.setStyleSheet('QMainWindow{background-color:' + str(canvas_color) + ';'
-                                   + 'border: 0px solid black;'
-                                   + '}' )
+        self.setStyleSheet(f'QMainWindow{{background-color:{rgba_colorname2argb_colorname(canvas_color)};border: 0px solid black;}}')
+
 
         if current_background_color is None or current_background_color != str(canvas_color) or (whitep and self.qmc.palette['messages'] != '#ffffff'): # canvas color did not change, we do not need to redo the navigation bar
             # update navigationbar
@@ -7220,8 +7241,8 @@ class ApplicationWindow(QMainWindow):
                 nv = numpy.atleast_1d(numpy.asarray(np_dbt is None)).nonzero()[0] # pyright:ignore[reportUnnecessaryComparison] # fixes "Calling nonzero on 0d arrays is not allowed" numpy error of previous two lines
                 nvb = numpy.atleast_1d(numpy.asarray(np_dbtb is None)).nonzero()[0] # pyright:ignore[reportUnnecessaryComparison] # fixes "Calling nonzero on 0d arrays is not allowed" numpy error of previous two lines
 
-                np_dbt = replNone(np_dbt,nv)
-                np_dbtb = replNone(np_dbtb,nvb)
+                np_dbt = replNone(np_dbt,nv) # zuban:ignore[arg-type]
+                np_dbtb = replNone(np_dbtb,nvb) # zuban:ignore[arg-type]
 
                 if len(np_dbt) == 0:
                     raise ValueError('Length of np_dbt is zero')
@@ -7341,15 +7362,15 @@ class ApplicationWindow(QMainWindow):
                         lasti = i
                 mask = numpy.r_[0, numpy.flatnonzero(rs_starts)]
                 starts_seg = rs_starts[mask]
-                lengths_seg = rs_lengths[mask]
-                deltatimes_seg = rs_deltatimes[mask]
+                lengths_seg = rs_lengths[mask] # zuban:ignore[index]
+                deltatimes_seg = rs_deltatimes[mask]  # zuban:ignore[index]
                 timeindexs_seg = timeindexs[mask]
 
                 for i, mm in enumerate(mask):
                     if i < len(mask) -1:
-                        x = maxdeltas[mm:mask[i+1]]
+                        x = maxdeltas[int(mm):mask[i+1]]
                     else:
-                        x = maxdeltas[mm:]
+                        x = maxdeltas[int(mm):]
                     maxdeltas_seg = numpy.append(maxdeltas_seg,x[abs(x).argmax()])
 
                 # Per segment metrics
@@ -8537,7 +8558,7 @@ class ApplicationWindow(QMainWindow):
     pyqtSlot()
     def sliderfocusIn(self) -> None:
         sender = self.sender()
-        if not self.qmc.designerflag and self.comparator is None and sender is not None and isinstance(sender, QSlider):
+        if not self.qmc.designerflag and self.comparator is None and sender is not None and isinstance(sender, SliderUnclickable):
             try:
                 n:int = [self.slider1,self.slider2,self.slider3,self.slider4,self.sliderSV].index(sender)
                 self.quickEventShortCut = (n,'')
@@ -9166,7 +9187,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('read'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "read(s,r)"
-                                        self.modbus.lastReadResult = self.modbus.readSingleRegister(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        self.modbus.lastReadResult = self.modbus.readSingleRegister(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument]
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9175,7 +9196,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('readSigned'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "readSigned(s,r)"
-                                        self.modbus.lastReadResult = self.modbus.readSingleRegister(*cmds,force=True,signed=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        self.modbus.lastReadResult = self.modbus.readSingleRegister(*cmds,force=True,signed=True)  # pyrefly: ignore[bad-keyword-argument]
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9184,7 +9205,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('readBCD'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "readBCD(s,r)"
-                                        self.modbus.lastReadResult = self.modbus.readBCDint(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        self.modbus.lastReadResult = self.modbus.readBCDint(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument]
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9193,7 +9214,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('read32'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "read32(s,r)"
-                                        self.modbus.lastReadResult = self.modbus.readInt32(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        self.modbus.lastReadResult = self.modbus.readInt32(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument]
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9202,7 +9223,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('read32Signed'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "read32Signed(s,r)"
-                                        self.modbus.lastReadResult = self.modbus.readInt32(*cmds,force=True,signed=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        self.modbus.lastReadResult = self.modbus.readInt32(*cmds,force=True,signed=True)  # pyrefly: ignore[bad-keyword-argument]
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9211,7 +9232,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('read32BCD'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "read32BCD(s,r)"
-                                        self.modbus.lastReadResult = self.modbus.readBCD(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        self.modbus.lastReadResult = self.modbus.readBCD(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument]
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9220,7 +9241,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('readFloat'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "readFloat(s,r)"
-                                        res:float|None = self.modbus.readFloat(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        res:float|None = self.modbus.readFloat(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument]
                                         self.modbus.lastReadResult = (res if res is None else int(round(res)))
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
@@ -10450,6 +10471,22 @@ class ApplicationWindow(QMainWindow):
                                                     self.eventquantifieractive[event_type - 1] = False
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+
+                           # pidSVbuttons(<bool>) toggles the visibility of the PID SV buttons
+                            elif cs.startswith('pidSVbuttons(') and cs.endswith(')'):
+                                try:
+                                    if self.notificationManager:
+                                        value_str = cs[len('pidSVbuttons('):-1].strip()
+                                        if value_str.lower() in {'yes', 'true', 't', '1'}:
+                                            self.pidcontrol.svButtons = True
+                                            QTimer.singleShot(100, self.showSVButtons) # needs to run in the GUI thread!
+                                            self.sendmessage(QApplication.translate('Message','PID SV buttons on'))
+                                        else:
+                                            self.pidcontrol.svButtons = False
+                                            QTimer.singleShot(100, self.hideSVButtons) # needs to run in the GUI thread!
+                                            self.sendmessage(QApplication.translate('Message','PID SV buttons off'))
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
                             # slider(<int>, <bool>) with <int> from {1,2,3,4,5} selecting one of the four event types or with 5 the PID SV slider
                             elif cs.startswith('slider(') and cs.endswith(')'):
                                 try:
@@ -11531,7 +11568,7 @@ class ApplicationWindow(QMainWindow):
 
         if reply == QMessageBox.StandardButton.Reset :
             #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
-            self.resetqsettings = 1
+            self.resetqsettings = 1  # zuban:ignore[unreachable]
             self.clearExtraDeviceSettingsBackup()
             _log.info('Factory reset')
             self.close()
@@ -11824,6 +11861,12 @@ class ApplicationWindow(QMainWindow):
 
     def updateSVsliderVisibility(self) -> None:
         self.sliderGrpBoxSV.setVisible(self.pidcontrol.svSlider)
+
+    def showSVButtons(self) -> None:
+        self.pidcontrol.showSVButtons()
+
+    def hideSVButtons(self) -> None:
+        self.pidcontrol.hideSVButtons()
 
     def updateSlidersProperties(self) -> None:
         # update slider properties and event type names
@@ -12471,7 +12514,7 @@ class ApplicationWindow(QMainWindow):
                             self.moveslider(eventNr,value)
                             self.recordsliderevent(eventNr)
                             focus_widget = QApplication.focusWidget()
-                            if focus_widget is not None and isinstance(focus_widget, QSlider):
+                            if focus_widget is not None and isinstance(focus_widget, SliderUnclickable):
                                 try:
                                     n:int = [self.slider1,self.slider2,self.slider3,self.slider4].index(focus_widget)
                                     self.quickEventShortCut = (n,'') # restart with the focused slider event type
@@ -14161,13 +14204,15 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extratimexB = timex
 
                 if 'extraDelta1' in profile:
-                    self.extraDelta1 = profile['extraDelta1']
+                    self.extraDelta1b = profile['extraDelta1'][:self.nLCDS]
+                    self.extraDelta1b = self.extraDelta1b + [False]*max(0,self.nLCDS-len(self.extraDelta1b))
                 else:
-                    self.extraDelta1 = [False]*len(names1x)
+                    self.extraDelta1b = self.extraDelta1[:] # by default use the same y-axis as the foreground extra devices
                 if 'extraDelta2' in profile:
-                    self.extraDelta2 = profile['extraDelta2']
+                    self.extraDelta2b = profile['extraDelta2'][:self.nLCDS]
+                    self.extraDelta2b = self.extraDelta2b + [False]*max(0,self.nLCDS-len(self.extraDelta2b))
                 else:
-                    self.extraDelta2 = [False]*len(names2x)
+                    self.extraDelta2b = self.extraDelta2[:] # by default use the same y-axis as the foreground extra devices
 
                 # we fill_gaps for all background curves on load, not to have to re-compute those on most redraws
                 if self.qmc.interpolateDropsflag:
@@ -14370,14 +14415,22 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extramathexpression2.append('')
 
             # ensure that the curves and LCDs of the new device are visible:
-            self.extraLCDvisibility1[n-1] = True
-            self.extraLCDvisibility2[n-1] = True
-            self.extraCurveVisibility1[n-1] = True
-            self.extraCurveVisibility2[n-1] = True
-            self.extraDelta1[n-1] = False
-            self.extraDelta2[n-1] = False
-            self.extraFill1[n-1] = 0
-            self.extraFill2[n-1] = 0
+            if len(self.extraLCDvisibility1)>n-1:
+                self.extraLCDvisibility1[n-1] = True
+            if len(self.extraLCDvisibility2)>n-1:
+                self.extraLCDvisibility2[n-1] = True
+            if len(self.extraCurveVisibility1)>n-1:
+                self.extraCurveVisibility1[n-1] = True
+            if len(self.extraCurveVisibility2)>n-1:
+                self.extraCurveVisibility2[n-1] = True
+            if len(self.extraDelta1)>n-1:
+                self.extraDelta1[n-1] = False
+            if len(self.extraDelta2)>n-1:
+                self.extraDelta2[n-1] = False
+            if len(self.extraFill1)>n-1:
+                self.extraFill1[n-1] = 0
+            if len(self.extraFill2)>n-1:
+                self.extraFill2[n-1] = 0
 
             #create new serial port (but don't open it yet). Store initial settings
             self.addSerialPort()
@@ -15142,13 +15195,13 @@ class ApplicationWindow(QMainWindow):
                         c += 1
                         try:
                             # error: Cannot assign to attribute "value" for class "MergedCell" "str" is not assignable to "None"
-                            ws.cell(row=r,column=c).value = el[0] # pyright:ignore[reportAttributeAccessIssue] # pyrefly: ignore[bad-assignment]
+                            ws.cell(row=r,column=c).value = el[0] # zuban:ignore[misc,assignment] # pyright:ignore[reportAttributeAccessIssue] # pyrefly: ignore[bad-assignment]
                         except Exception:
                             pass
                         c += 1
                         try:
                             # error: Cannot assign to attribute "value" for class "MergedCell" "str" is not assignable to "None"
-                            ws.cell(row=r,column=c).value = el[1] # pyright:ignore[reportAttributeAccessIssue] # pyrefly: ignore[bad-assignment]
+                            ws.cell(row=r,column=c).value = el[1] # zuban:ignore[assignment,misc] # pyright:ignore[reportAttributeAccessIssue] # pyrefly: ignore[bad-assignment]
                         except Exception:
                             pass
 
@@ -15197,12 +15250,12 @@ class ApplicationWindow(QMainWindow):
 
                             for j in range(6):
                                 try:
-                                    ws.cell(row=r+i, column=j+1).value = eval(fieldlist[j][1]) # pylint: disable=eval-used
+                                    ws.cell(row=r+i, column=j+1).value = eval(fieldlist[j][1]) # zuban:ignore[misc] # pylint: disable=eval-used
                                 except Exception: # pylint: disable=broad-except
                                     pass
 
                             for j, etemp in enumerate(extratemps):
-                                ws.cell(row=r+i, column=7+j).value = etemp # pyrefly:ignore[bad-assignment] # pyright:ignore[reportAttributeAccessIssue]
+                                ws.cell(row=r+i, column=7+j).value = etemp # zuban:ignore[assignment,misc] # pyrefly:ignore[bad-assignment] # pyright:ignore[reportAttributeAccessIssue]
 
                         last_time = time1
 
@@ -15242,6 +15295,24 @@ class ApplicationWindow(QMainWindow):
         self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1 + ['#000000']*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor1))
         self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:len(self.qmc.extradevices)]
         self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2 + ['#000000']*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor2))
+        # with fixed length of self.nLCDS:
+        self.extraLCDvisibility1 = self.extraLCDvisibility1[:self.nLCDS]
+        self.extraLCDvisibility1 = self.extraLCDvisibility1 + [False]*max(0,self.nLCDS-len(self.extraLCDvisibility1))
+        self.extraLCDvisibility2 = self.extraLCDvisibility2[:self.nLCDS]
+        self.extraLCDvisibility2 = self.extraLCDvisibility2 + [False]*max(0,self.nLCDS-len(self.extraLCDvisibility2))
+        self.extraCurveVisibility1 = self.extraCurveVisibility1[:self.nLCDS]
+        self.extraCurveVisibility1 = self.extraCurveVisibility1 + [True]*max(0,self.nLCDS-len(self.extraCurveVisibility1))
+        self.extraCurveVisibility2 = self.extraCurveVisibility2[:self.nLCDS]
+        self.extraCurveVisibility2 = self.extraCurveVisibility2 + [True]*max(0,self.nLCDS-len(self.extraCurveVisibility2))
+        self.extraDelta1 = self.extraDelta1[:self.nLCDS]
+        self.extraDelta1 = self.extraDelta1 + [False]*max(0,self.nLCDS-len(self.extraDelta1))
+        self.extraDelta2 = self.extraDelta2[:self.nLCDS]
+        self.extraDelta2 = self.extraDelta2 + [False]*max(0,self.nLCDS-len(self.extraDelta2))
+        self.extraFill1 = self.extraFill1[:self.nLCDS]
+        self.extraFill1 = self.extraFill1 + [0]*max(0,self.nLCDS-len(self.extraFill1))
+        self.extraFill2 = self.extraFill2[:self.nLCDS]
+        self.extraFill2 = self.extraFill2 + [0]*max(0,self.nLCDS-len(self.extraFill2))
+
 
     def saveExtradeviceSettings(self) -> None:
         self.org_extradevicesettings = cast('ExtraDeviceSettings', {
@@ -15711,39 +15782,48 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.extradevicecolor1 = [decodeLocalStrict(x, '#000000') for x in profile['extradevicecolor1']]
                     if 'extradevicecolor2' in profile:
                         self.qmc.extradevicecolor2 = [decodeLocalStrict(x, '#000000') for x in profile['extradevicecolor2']]
-
+                    ## lists of fixed length (self.nLCDS)
                     if 'extraLCDvisibility1' in profile:
-                        self.extraLCDvisibility1 = profile['extraLCDvisibility1']
+                        self.extraLCDvisibility1 = profile['extraLCDvisibility1'][:self.nLCDS]
+                        self.extraLCDvisibility1 = self.extraLCDvisibility1 + [False]*max(0,self.nLCDS-len(self.extraLCDvisibility1))
                     else:
                         self.extraLCDvisibility1 = [False]*self.nLCDS
                     if 'extraLCDvisibility2' in profile:
-                        self.extraLCDvisibility2 = profile['extraLCDvisibility2']
+                        self.extraLCDvisibility2 = profile['extraLCDvisibility2'][:self.nLCDS]
+                        self.extraLCDvisibility2 = self.extraLCDvisibility2 + [False]*max(0,self.nLCDS-len(self.extraLCDvisibility2))
                     else:
                         self.extraLCDvisibility2 = [False]*self.nLCDS
                     if 'extraCurveVisibility1' in profile:
-                        self.extraCurveVisibility1 = profile['extraCurveVisibility1']
+                        self.extraCurveVisibility1 = profile['extraCurveVisibility1'][:self.nLCDS]
+                        self.extraCurveVisibility1 = self.extraCurveVisibility1 + [True]*max(0,self.nLCDS-len(self.extraCurveVisibility1))
                     else:
-                        self.extraCurveVisibility1 = [False]*self.nLCDS
+                        self.extraCurveVisibility1 = [True]*self.nLCDS
                     if 'extraCurveVisibility2' in profile:
-                        self.extraCurveVisibility2 = profile['extraCurveVisibility2']
+                        self.extraCurveVisibility2 = profile['extraCurveVisibility2'][:self.nLCDS]
+                        self.extraCurveVisibility2 = self.extraCurveVisibility2 + [True]*max(0,self.nLCDS-len(self.extraCurveVisibility2))
                     else:
-                        self.extraCurveVisibility2 = [False]*self.nLCDS
+                        self.extraCurveVisibility2 = [True]*self.nLCDS
                     if 'extraDelta1' in profile:
-                        self.extraDelta1 = profile['extraDelta1']
+                        self.extraDelta1 = profile['extraDelta1'][:self.nLCDS]
+                        self.extraDelta1 = self.extraDelta1 + [False]*max(0,self.nLCDS-len(self.extraDelta1))
                     else:
                         self.extraDelta1 = [False]*self.nLCDS
                     if 'extraDelta2' in profile:
-                        self.extraDelta2 = profile['extraDelta2']
+                        self.extraDelta2 = profile['extraDelta2'][:self.nLCDS]
+                        self.extraDelta2 = self.extraDelta2 + [False]*max(0,self.nLCDS-len(self.extraDelta2))
                     else:
                         self.extraDelta2 = [False]*self.nLCDS
                     if 'extraFill1' in profile:
-                        self.extraFill1 = profile['extraFill1']
+                        self.extraFill1 = profile['extraFill1'][:self.nLCDS]
+                        self.extraFill1 = self.extraFill1 + [0]*max(0,self.nLCDS-len(self.extraFill1))
                     else:
                         self.extraFill1 = [0]*self.nLCDS
                     if 'extraFill2' in profile:
-                        self.extraFill2 = profile['extraFill2']
+                        self.extraFill2 = profile['extraFill2'][:self.nLCDS]
+                        self.extraFill2 = self.extraFill2 + [0]*max(0,self.nLCDS-len(self.extraFill2))
                     else:
                         self.extraFill2 = [0]*self.nLCDS
+                    ##
                     if 'extramarkersizes1' in profile:
                         self.qmc.extramarkersizes1 = [max(self.qmc.markersize_min, float(ms)) for ms in profile['extramarkersizes1']]
                     else:
@@ -16163,7 +16243,7 @@ class ApplicationWindow(QMainWindow):
 
             # only load annotations position if the temperature mode did not change
             if 'anno_positions' in profile and self.qmc.mode == m:
-                self.qmc.setAnnoPositions(profile['anno_positions'])
+                self.qmc.setAnnoPositions(profile['anno_positions']) # zuban:ignore[arg-type]
             else:
                 self.qmc.l_annotations_pos_dict = {}
             if 'flag_positions' in profile and self.qmc.mode == m:
@@ -16196,6 +16276,7 @@ class ApplicationWindow(QMainWindow):
             elif len(self.qmc.timex)>2:
                 self.qmc.profile_sampling_interval = (self.qmc.timex[-1] - self.qmc.timex[0])/(len(self.qmc.timex) -1)
             self.qmc.updateDeltaSamples()
+
             # Ramp/Soak Profiles
             if self.pidcontrol.loadRampSoakFromProfile and filename is not None:
                 self.loadRampSoakFromProfile(filename,profile)
@@ -16228,6 +16309,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.phases[2] = int(round(self.qmc.temp2[self.qmc.timeindex[2]]))
             # ensure that timeindex has the proper length
             self.qmc.timeindex = self.qmc.timeindex + [0 for _ in range(8-len(self.qmc.timeindex))]
+
             # reset linecount caches
             self.qmc.resetlinecountcaches()
             # try to reload background profile
@@ -16954,6 +17036,7 @@ class ApplicationWindow(QMainWindow):
             profile['moisture_greens'] = self.qmc.moisture_greens
             profile['greens_temp'] = self.qmc.greens_temp
             profile['moisture_roasted'] = self.qmc.moisture_roasted
+            self.ensureCorrectExtraDeviceListLength() # make sure that all extra device structures have consistent length
             profile['extradevices'] = self.qmc.extradevices
             profile['extraname1'] = [encodeLocalStrict(n, 'Extra 1') for n in self.qmc.extraname1]
             profile['extraname2'] = [encodeLocalStrict(n, 'Extra 2') for n in self.qmc.extraname2]
@@ -22273,7 +22356,7 @@ class ApplicationWindow(QMainWindow):
                     elif src == 'rank' and fld in rd:
                         res_fld = rd[fld]
                     elif src == 'prod' and pd is not None and fld in pd:
-                        res_fld = pd[fld] # type: ignore[literal-required] # TypedDict key must be a string literal; expected one of ("id", "nr", "title", "datetime", "time", ...)
+                        res_fld = pd[fld] # type: ignore[literal-required, misc, unused-ignore, unused-ignore] # TypedDict key must be a string literal; expected one of ("id", "nr", "title", "datetime", "time", ...)
                     elif src == 'eval':
                         res_fld = eval(fld) # pylint: disable=eval-used
                         if res_fld in {'None', None}:
@@ -22516,7 +22599,7 @@ class ApplicationWindow(QMainWindow):
                     min_start_time:float = 0
                     max_end_time:float = 0
                     first_profile:bool = True
-                    first_profile_event_time = 0
+                    first_profile_event_time:float = 0
                     max_drop_time = 0
                     label_chr_nr = 0
 
@@ -23131,6 +23214,8 @@ class ApplicationWindow(QMainWindow):
                             cnum += 1
                             cr:str = f'{get_column_letter(cnum)}{c}'
 
+                            res_fld:float
+
                             name = rdf[field_index.index('name')]
                             fld:str = rdf[field_index.index('fld')]
                             src:str = rdf[field_index.index('src')]
@@ -23144,7 +23229,7 @@ class ApplicationWindow(QMainWindow):
                             elif src == 'rank' and fld in rd:
                                 res_fld = rd[fld]
                             elif src == 'prod' and fld in pd:
-                                res_fld = pd[fld] # type:ignore[literal-required]
+                                res_fld = pd[fld] # type:ignore[literal-required, misc, unused-ignore]
                             elif src == 'eval':
                                 try:
                                     res_fld = eval(fld) # pylint: disable=eval-used
@@ -27081,11 +27166,13 @@ class ApplicationWindow(QMainWindow):
                     self.sendmessage(QApplication.translate('Error Message', 'Analyze: no background profile data available'))
                     self.qmc.backgroundDetails = orig_backgroundDetails
                     self.redrawOnResize = True
+                    progress.cancel()
                     return
                 if not (self.qmc.timeindexB[0] > -1 and self.qmc.timeindexB[6]):
                     self.sendmessage(QApplication.translate('Error Message', 'Analyze: background profile requires CHARGE and DROP events'))
                     self.qmc.backgroundDetails = orig_backgroundDetails
                     self.redrawOnResize = True
+                    progress.cancel()
                     return
 
                 # set curvefit_starttime to match analysis_starttime

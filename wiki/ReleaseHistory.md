@@ -2,7 +2,20 @@ Detailed Release History
 ========================
 
 ----
-v4.0.0 (Jan XX, 2026)
+v4.0.2 (Feb 7, 2026)
+------------------
+
+* CHANGES
+  - event replay is OFF by default for all event types
+  - reset CM ET/BT device calculation on background profile horizontal re-alignment
+
+* FIXES
+  - fixes regression where cut/copy/paste shortcuts are not working in file selector dialogs ([Issue #2114](../../../issues/2114))
+  - fixes build issues which broke PDF reports on Linux and macOS ([Issue #2113](../../../issues/2113))
+  - fixes issue with delta axis assignments in extra device setups on loading background profiles
+
+----
+v4.0.0 (Jan 28, 2026)
 ------------------
 
 * ADDITIONS
@@ -20,8 +33,9 @@ v4.0.0 (Jan XX, 2026)
   - adds calculation of energy data from PID Duty %
   - adds OPTION click on ET/BT or DeltaET/DeltaBT LCDs to hide/show the corresponding background curves
   - adds title click shortcut to open Roast Properties dialog
-  - adds deselection of selected event using key ESC
+  - adds deselection of selected custom event using key ESC
   - adds temporary autozoom gesture (double-click on the graph canvas) to scale the y-axis such that all data is rendered on screen
+  - adds legend to cupping spider chart
 
 * CHANGES
   - improved ramping event tracking with lookahead, avoiding non-linearities and bumps

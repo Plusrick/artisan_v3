@@ -13,14 +13,14 @@
 # the GNU General Public License for more details.
 #
 # AUTHOR
-# Dave Baxter, Marko Luther 2025
+# Dave Baxter, Marko Luther 2026
 
 # Include "skip ci" in the commit message to prevent this build process from running
 environment:
   # Set the default Appveyor Python version here. Can be overridden in platform environment.
   PYTHON_V: 3.13
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  PYUPGRADE_WIN_VER: 3.14.2
+  PYUPGRADE_WIN_VER: 3.14.3
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
 
   matrix:
@@ -68,7 +68,7 @@ for:
     QT_PATH: "C:/qt/6.9.3/msvc2022_64"
     PYQT: "6"
     PYUIC: "pyuic6.exe"
-    BUILD_PYINSTALLER: "False"
+    BUILD_PYINSTALLER: "True"
     VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
     VCVARSALL: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvarsall.bat"
 
@@ -154,7 +154,7 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON_UPGRADE_V: 3.14.2  # Upgrade to this version
+    PYTHON_UPGRADE_V: 3.14.3  # Upgrade to this version
     PYTHON_V: 3.12  # Override the stack key with latest Appveyor version
     ARTISAN_OS: macos
     MACOSX_DEPLOYMENT_TARGET: 13.0
